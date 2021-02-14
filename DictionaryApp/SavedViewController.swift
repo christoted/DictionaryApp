@@ -17,7 +17,11 @@ class SavedViewController: UIViewController, UITableViewDelegate, UITableViewDat
     //var context for coredata
     var context: NSManagedObjectContext!
     
+    // For Section
     var arrSection = [String]()
+    var arrDictionary = [[DictionaryModel]]()
+    
+    
     var listOfDefintions = [Definition]()
     var listofDictionary = [DictionaryResponse]()
 
@@ -36,14 +40,22 @@ class SavedViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func deleteData(indexPath: IndexPath) {
-        let oldWord = listofDictionary[indexPath.section].word as! String
-        let oldListDefinition = listofDictionary[indexPath.section].definition
-        let oldDefinition = listofDictionary[indexPath.section].definition?[indexPath.row].definition as! String
+//        let oldWord = listofDictionary[indexPath.section].word as! String
+//        let oldListDefinition = listofDictionary[indexPath.section].definition
+//        let oldDefinition = listofDictionary[indexPath.section].definition?[indexPath.row].definition as! String
+//
+//        let oldEmoji = listofDictionary[indexPath.section].definition?[indexPath.row].emoji as? String
+//        let oldExample = listofDictionary[indexPath.section].definition?[indexPath.row].example as? String
+//        let oldImageURL = listofDictionary[indexPath.section].definition?[indexPath.row].image_url as? String
+//        let oldType = listofDictionary[indexPath.section].definition?[indexPath.row].type as! String
         
-        let oldEmoji = listofDictionary[indexPath.section].definition?[indexPath.row].emoji as? String
-        let oldExample = listofDictionary[indexPath.section].definition?[indexPath.row].example as? String
-        let oldImageURL = listofDictionary[indexPath.section].definition?[indexPath.row].image_url as? String
-        let oldType = listofDictionary[indexPath.section].definition?[indexPath.row].type as! String
+        let oldWord = arrDictionary[indexPath.section][indexPath.row].word as! String
+        let oldDefinition = arrDictionary[indexPath.section][indexPath.row].definition as! String
+        let oldEmoji = arrDictionary[indexPath.section][indexPath.row].emoji as? String
+        let oldExample = arrDictionary[indexPath.section][indexPath.row].example as? String
+        let oldImageURL = arrDictionary[indexPath.section][indexPath.row].image_url as? String
+        let oldType = arrDictionary[indexPath.section][indexPath.row].type as! String
+        
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "DictionaryTable")
         
         if (oldImageURL == nil) {
@@ -75,16 +87,14 @@ class SavedViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func getData() {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "DictionaryTable")
         
-        listofDictionary.removeAll()
+        arrSection.removeAll()
+        arrDictionary.removeAll()
         do {
             let results = try context.fetch(request) as! [NSManagedObject]
            
             for i in results {
-                
-                listOfDefintions.removeAll()
-              
-                let dictionary = DictionaryResponse()
-                let definition = Definition()
+            
+                let dictionaryModel = DictionaryModel()
         
                 
                 let def = i.value(forKey: "definition") as? String
@@ -96,15 +106,18 @@ class SavedViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 let word = i.value(forKey: "word") as? String
                 
               
-            
-                definition.type = type
-                definition.definition = def
-                definition.example = example
-                definition.emoji = emoji
+        
+                
+                dictionaryModel.type = type
+                dictionaryModel.definition = def
+                dictionaryModel.example = example
+                dictionaryModel.emoji = emoji
+                dictionaryModel.word = word
+
                 
                 if ( image_url != nil) {
-                    definition.image_url = image_url
-                    
+                    dictionaryModel.image_url = image_url
+
                     let url = URL(string: image_url!)
                     
                     let imageTask = URLSession.shared.dataTask(with: url!) { (data, response, error) in
@@ -113,7 +126,8 @@ class SavedViewController: UIViewController, UITableViewDelegate, UITableViewDat
                             return
                         }
                         
-                        definition.image = UIImage(data: data!)
+
+                        dictionaryModel.image = UIImage(data: data!)
                         
                         DispatchQueue.main.async {
                             self.tvSavedWord.reloadData()
@@ -126,19 +140,43 @@ class SavedViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     
                 }
                 
-                
-                listOfDefintions.append(definition)
-                
-                dictionary.definition = listOfDefintions
-                
-                
-                dictionary.word = word
-                
+                if ( arrSection.count == 0) {
+                    arrSection.append(dictionaryModel.word!)
+                   
+                    for i in 0...arrSection.count-1 {
+                        arrDictionary.append([DictionaryModel]())
+                        arrDictionary[i].append(dictionaryModel)
+                    }
+                    print("TEST")
 
-                listofDictionary.append(dictionary)
+                   
+                } else {
+                    var position: Int?
+                    var flag: Int = 0
+                    for i in 0...arrSection.count-1 {
+                      
+                        if ( dictionaryModel.word == arrSection[i]) {
+                            arrDictionary.append([DictionaryModel]())
+                            flag = 1
+                            position = i
+                            arrDictionary[i].append(dictionaryModel)
+                            print("\(position!)")
+                            break
+
+                        }
+                    }
+                    print("TEST")
+
+                    if flag == 0 {
+                        arrDictionary.append([DictionaryModel]())
+                        arrSection.append(dictionaryModel.word!)
+                        arrDictionary[arrSection.count-1].append(dictionaryModel)
+                    }
+                }
             }
+        
             
-            if ( listofDictionary.count != 0) {
+            if ( arrDictionary.count != 0) {
                 lblDataIndicator.isHidden = true
             } else {
                 lblDataIndicator.isHidden = false
@@ -159,35 +197,38 @@ class SavedViewController: UIViewController, UITableViewDelegate, UITableViewDat
     // Section
     func numberOfSections(in tableView: UITableView) -> Int {
 
-        return listofDictionary.count
+        return arrSection.count
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return listofDictionary[section].word
+        return arrSection[section]
     }
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        if ( listofDictionary[section].definition?.count == nil) {
+        arrDictionary.append([DictionaryModel]())
+        if ( arrDictionary[section].count == 0) {
+            
+            
             return 0
         } else {
-             return listofDictionary[section].definition!.count
+             return arrDictionary[section].count
         }
-    
+        return 0
        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell_save") as! WordSaveTableViewCell
         
-        let wordDef = listofDictionary[indexPath.section].definition?[indexPath.row]
         
-        cell.lblTypeSave.text = listofDictionary[indexPath.section].definition?[indexPath.row].type
+        let wordDef = arrDictionary[indexPath.section][indexPath.row]
         
-        cell.lblDefinitionSave.text = listofDictionary[indexPath.section].definition?[indexPath.row].definition
+        cell.lblTypeSave.text = arrDictionary[indexPath.section][indexPath.row].type
         
-        if let image = wordDef?.image {
+        cell.lblDefinitionSave.text = arrDictionary[indexPath.section][indexPath.row].definition
+        
+        if let image = wordDef.image {
             cell.ivWordSave.image = image
         } else {
             cell.ivWordSave.image = UIImage(named: "loading1")
