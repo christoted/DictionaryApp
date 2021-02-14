@@ -70,83 +70,98 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             if ( error != nil) {
-                print(error?.localizedDescription)
-            }
-            
-            do {
+                print(error as Any)
+            } else {
+                let httpResponse = response as? HTTPURLResponse
                 
-                let responseObj = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as! [String: Any]
+                print(String(decoding: data!, as: UTF8.self))
                 
-                let arrDefinitions = responseObj["definitions"] as! [[String : Any]]
-                
-                self.listOfDefintions.removeAll()
-
-                for result in arrDefinitions {
-                    
-                    let definition = Definition()
-                    
-                    let type = result["type"] as! String
-                    let def = result["definition"] as! String
-                    let example = result["example"] as? String
-                    let image_url = result["image_url"] as? String
-                    let emoji = result["emoji"] as? String
-                    
-                    
-                    if ( image_url != nil) {
-                        let url = URL(string: image_url!)
+                if (httpResponse?.statusCode == 404) {
+                    DispatchQueue.main.async {
+                        self.showAlert(title: "Missing", message: "Sorry Unfortunately \(word) not found ")
+                    }
+                } else {
+                    do {
                         
-                        let imageTask = URLSession.shared.dataTask(with: url!) { (data, response, error) in
-                            if ( error != nil) {
-                                print(error?.localizedDescription)
-                                return
+                        let responseObj = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as! [String: Any]
+                        
+                        let arrDefinitions = responseObj["definitions"] as! [[String : Any]]
+                        
+                        self.listOfDefintions.removeAll()
+
+                        for result in arrDefinitions {
+                            
+                            let definition = Definition()
+                            
+                            let type = result["type"] as! String
+                            let def = result["definition"] as! String
+                            let example = result["example"] as? String
+                            let image_url = result["image_url"] as? String
+                            let emoji = result["emoji"] as? String
+                            
+                            
+                            if ( image_url != nil) {
+                                let url = URL(string: image_url!)
+                                
+                                let imageTask = URLSession.shared.dataTask(with: url!) { (data, response, error) in
+                                    if ( error != nil) {
+                                        print(error?.localizedDescription)
+                                        return
+                                    }
+                                    
+                                    definition.image = UIImage(data: data!)
+
+                                    DispatchQueue.main.async {
+                                        self.tvDictionary.reloadData()
+                                    }
+
+
+                                    }
+
+                                imageTask.resume()
                             }
                             
-                            definition.image = UIImage(data: data!)
+                            definition.type = type
+                            definition.definition = def
+                            definition.example = example
+                            definition.image_url = image_url
+                            definition.emoji = emoji
+                            
+                        
+                                                     
+                            self.listOfDefintions.append(definition)
+                            
+                        }
+                        
 
-                            DispatchQueue.main.async {
-                                self.tvDictionary.reloadData()
-                            }
-
-
-                            }
-
-                        imageTask.resume()
-                    }
-                    
-                    definition.type = type
-                    definition.definition = def
-                    definition.example = example
-                    definition.image_url = image_url
-                    definition.emoji = emoji
-                    
-                
-                                             
-                    self.listOfDefintions.append(definition)
-                    
-                }
-                
-
-                
-    
-                let word = responseObj["word"] as! String
-                let pronunciation = responseObj["pronunciation"] as? String
-                
-                self.dictionaryResponse.definition = self.listOfDefintions
-                self.dictionaryResponse.word = word
-                self.dictionaryResponse.pronunciation = pronunciation
-                
-                
-                self.listofDictionary.append(self.dictionaryResponse)
+                        
             
-                
-                DispatchQueue.main.async {
-                    self.tvDictionary.reloadData()
+                        let word = responseObj["word"] as! String
+                        let pronunciation = responseObj["pronunciation"] as? String
+                        
+                        self.dictionaryResponse.definition = self.listOfDefintions
+                        self.dictionaryResponse.word = word
+                        self.dictionaryResponse.pronunciation = pronunciation
+                        
+                        
+                        self.listofDictionary.append(self.dictionaryResponse)
+                    
+                        
+                        DispatchQueue.main.async {
+                            self.tvDictionary.reloadData()
+                        }
+                        
+                    } catch let error {
+                        print(error.localizedDescription)
+                        
+                    }
                 }
                 
-            } catch let error {
-                print(error.localizedDescription)
                 
+            
             }
+            
+            
         
         }.resume()
         
