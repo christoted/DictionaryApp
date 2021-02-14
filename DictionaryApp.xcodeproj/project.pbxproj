@@ -17,6 +17,7 @@
 		524B936825D4427800C9276B /* DictionaryResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524B936725D4427800C9276B /* DictionaryResponse.swift */; };
 		524B936A25D4433D00C9276B /* Definition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524B936925D4433D00C9276B /* Definition.swift */; };
 		52875A9525D59857001AB43D /* SavedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52875A9425D59857001AB43D /* SavedViewController.swift */; };
+		52A74A3725D9300A0045DD9E /* DictionaryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A74A3625D9300A0045DD9E /* DictionaryModel.swift */; };
 		52C8581B25D5154800834789 /* WordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8581A25D5154800834789 /* WordTableViewCell.swift */; };
 		52CF7D6625D697D3000416B6 /* WordSaveTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CF7D6525D697D3000416B6 /* WordSaveTableViewCell.swift */; };
 /* End PBXBuildFile section */
@@ -34,6 +35,7 @@
 		524B936725D4427800C9276B /* DictionaryResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryResponse.swift; sourceTree = "<group>"; };
 		524B936925D4433D00C9276B /* Definition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Definition.swift; sourceTree = "<group>"; };
 		52875A9425D59857001AB43D /* SavedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedViewController.swift; sourceTree = "<group>"; };
+		52A74A3625D9300A0045DD9E /* DictionaryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryModel.swift; sourceTree = "<group>"; };
 		52C8581A25D5154800834789 /* WordTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTableViewCell.swift; sourceTree = "<group>"; };
 		52CF7D6525D697D3000416B6 /* WordSaveTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSaveTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -54,6 +56,7 @@
 			children = (
 				524B936725D4427800C9276B /* DictionaryResponse.swift */,
 				524B936925D4433D00C9276B /* Definition.swift */,
+				52A74A3625D9300A0045DD9E /* DictionaryModel.swift */,
 				524B934F25D4418400C9276B /* DictionaryApp */,
 				524B934E25D4418400C9276B /* Products */,
 			);
@@ -165,6 +168,7 @@
 				524B936A25D4433D00C9276B /* Definition.swift in Sources */,
 				52875A9525D59857001AB43D /* SavedViewController.swift in Sources */,
 				524B935325D4418400C9276B /* SceneDelegate.swift in Sources */,
+				52A74A3725D9300A0045DD9E /* DictionaryModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
